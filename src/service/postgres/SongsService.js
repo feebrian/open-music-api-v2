@@ -24,12 +24,33 @@ class SongsService {
     return result.rows[0].id;
   }
 
-  async getSongs() {
-    const query = {
-      text: 'SELECT id, title, performer FROM songs',
-    };
+  async getSongs({ title, performer }) {
+    let result;
 
-    const result = await this._pool.query(query);
+    if (title && !performer) {
+      result = await this._pool.query(
+        'SELECT id, title, performer FROM songs WHERE title ILIKE $1',
+        [`${title}%`],
+      );
+    }
+
+    if (performer && !title) {
+      result = await this._pool.query(
+        'SELECT id, title, performer FROM songs WHERE performer ILIKE $1',
+        [`${performer}%`],
+      );
+    }
+
+    if (performer && title) {
+      result = await this._pool.query(
+        'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
+        [`${title}%`, `${performer}%`],
+      );
+    }
+
+    if (!performer && !title) {
+      result = await this._pool.query('SELECT id, title, performer FROM songs');
+    }
 
     return result.rows;
   }
