@@ -63,6 +63,7 @@ const init = async () => {
       });
 
       newResponse.code(500);
+      // eslint-disable-next-line no-console
       console.error(response);
       return newResponse;
     }
