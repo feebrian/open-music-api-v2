@@ -67,6 +67,8 @@ class PlaylistsService {
     if (!result.rowCount) {
       throw new InvariantError('Lagu gagal ditambahkan ke playlist');
     }
+
+    return result;
   }
 
   async getSongsFromPlaylist(playlistId) {
@@ -112,6 +114,8 @@ class PlaylistsService {
     if (!result.rowCount) {
       throw new NotFoundError('Gagal menghapus lagu dari playlist');
     }
+
+    return result;
   }
 
   async verifyPlaylistOwner(playlistId, owner) {
