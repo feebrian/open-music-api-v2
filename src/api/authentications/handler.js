@@ -10,11 +10,10 @@ class AuthenticationsHandler {
     this._validator.validatePostAuthenticationPayload(req.payload);
 
     const { username, password } = req.payload;
-    const id = await this._usersService.verifyUserCredentials(username, password);
-    console.log(id);
+    const userId = await this._usersService.verifyUserCredentials(username, password);
 
-    const accessToken = await this._tokenManager.generateAccessToken({ id });
-    const refreshToken = await this._tokenManager.generateRefreshToken({ id });
+    const accessToken = await this._tokenManager.generateAccessToken({ userId });
+    const refreshToken = await this._tokenManager.generateRefreshToken({ userId });
     await this._authenticationsService.addRefreshToken(refreshToken);
 
     const res = h.response({
@@ -33,9 +32,9 @@ class AuthenticationsHandler {
     const { refreshToken } = req.payload;
 
     await this._authenticationsService.verifyRefreshToken(refreshToken);
-    const id = this._tokenManager.verifyRefreshToken(refreshToken);
+    const userId = this._tokenManager.verifyRefreshToken(refreshToken);
 
-    const accessToken = this._tokenManager.generateAccessToken({ id });
+    const accessToken = this._tokenManager.generateAccessToken({ userId });
 
     return {
       status: 'success',
