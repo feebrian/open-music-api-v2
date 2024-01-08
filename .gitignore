@@ -6,3 +6,6 @@
 
 # environment variable
 .env
+
+# static file
+src/api/uploads/file
