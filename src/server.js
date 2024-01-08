@@ -1,6 +1,9 @@
+/* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 const hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const path = require('path');
+const inert = require('@hapi/inert');
 
 // error
 const ClientError = require('./exceptions/ClientError');
@@ -44,6 +47,11 @@ const _exports = require('./api/exports');
 const producerService = require('./service/rabbitmq/ProducerService');
 const ExportPlaylistValidator = require('./validator/exports');
 
+// uploads albums cover
+const uploads = require('./api/uploads');
+const StorageService = require('./service/storage/StorageService');
+const UploadsValidator = require('./validator/uploads');
+
 const init = async () => {
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
@@ -52,6 +60,7 @@ const init = async () => {
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistsService(collaborationsService);
   const playlistActivitiesService = new PlaylistActivitiesService();
+  const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/covers'));
 
   const server = hapi.server({
     host: process.env.HOST,
@@ -59,9 +68,14 @@ const init = async () => {
   });
 
   // external plugin
-  await server.register({
-    plugin: Jwt,
-  });
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+    {
+      plugin: inert,
+    },
+  ]);
 
   server.auth.strategy('openmusic_jwt', 'jwt', {
     keys: process.env.ACCESS_TOKEN_KEY,
@@ -135,6 +149,14 @@ const init = async () => {
         producerService,
         playlistsService,
         validator: ExportPlaylistValidator,
+      },
+    },
+    {
+      plugin: uploads,
+      options: {
+        storageService,
+        albumsService,
+        validator: UploadsValidator,
       },
     },
   ]);

@@ -2,6 +2,7 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const config = require('../../utils/config');
 
 class AlbumsService {
   constructor() {
@@ -25,9 +26,31 @@ class AlbumsService {
     return result.rows[0].id;
   }
 
+  async addAlbumCover(filename, playlistId) {
+    const coverUrl = `http://${config.app.host}:${config.app.port}/uploads/file/covers/${filename}`;
+
+    const query = {
+      text: 'UPDATE albums SET cover = $1 WHERE id = $2',
+      values: [coverUrl, playlistId],
+    };
+
+    await this._pool.query(query);
+  }
+
+  async getAlbumCover(albumId) {
+    const query = {
+      text: 'SELECT cover FROM albums WHERE id = $1',
+      values: [albumId],
+    };
+
+    const result = await this._pool.query(query);
+
+    return result.rows[0];
+  }
+
   async getAlbumById(albumId) {
     const query = {
-      text: `SELECT a.id, a.name, a.year, s.id as song_id, s.title as song_title, s.performer as song_performer
+      text: `SELECT a.id, a.name, a.year, a.cover as cover_url, s.id as song_id, s.title as song_title, s.performer as song_performer
               FROM albums a
               LEFT JOIN songs s ON a.id = s.album_id 
               WHERE a.id = $1`,
@@ -44,6 +67,7 @@ class AlbumsService {
       id: result.rows[0].id,
       name: result.rows[0].name,
       year: result.rows[0].year,
+      coverUrl: result.rows[0].cover_url,
       songs: result.rows
         .map((row) => ({
           id: row.song_id,
