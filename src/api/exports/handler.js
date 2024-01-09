@@ -22,7 +22,7 @@ class ExportNotesHandler {
 
     const res = h.response({
       status: 'success',
-      mesage: 'Permintaan Anda sedang kami proses',
+      message: 'Permintaan Anda sedang kami proses',
     });
     res.code(201);
     return res;
