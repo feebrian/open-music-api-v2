@@ -21,9 +21,7 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
-      throw new InvariantError('User gagal ditambahkan');
-    }
+    if (!result.rowCount) throw new InvariantError('User gagal ditambahkan');
 
     return result.rows[0].id;
   }
@@ -36,9 +34,7 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    if (result.rowCount) {
-      throw new InvariantError('User gagal ditambahkan. Username telah digunakan');
-    }
+    if (result.rowCount) throw new InvariantError('User gagal ditambahkan. Username telah digunakan');
   }
 
   async verifyUserCredentials(username, password) {
@@ -49,9 +45,7 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
-      throw new AuthenticationError('Kredensial yang anda berikan salah');
-    }
+    if (!result.rowCount) throw new AuthenticationError('Kredensial yang anda berikan salah');
 
     const { id, password: hashedPassword } = result.rows[0];
     const passwordMatch = await bcrypt.compare(password, hashedPassword);
@@ -71,9 +65,7 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
-      throw new NotFoundError('User tidak ditemukan');
-    }
+    if (!result.rowCount) throw new NotFoundError('User tidak ditemukan');
   }
 }
 

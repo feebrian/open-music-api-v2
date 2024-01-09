@@ -19,9 +19,7 @@ class PlaylistActivitiesService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
-      throw new InvariantError('Aktivitas playlist gagal ditambahkan');
-    }
+    if (!result.rowCount) throw new InvariantError('Aktivitas playlist gagal ditambahkan');
   }
 
   async getPlaylistActivities(playlistId) {
@@ -37,9 +35,7 @@ class PlaylistActivitiesService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
-      throw new NotFoundError('Aktivitas playlist tidak ditemukan');
-    }
+    if (!result.rowCount) throw new NotFoundError('Aktivitas playlist tidak ditemukan');
 
     return {
       playlistId: result.rows[0].id,
